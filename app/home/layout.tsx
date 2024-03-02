@@ -11,7 +11,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       {loading ? (
         <RotatingLines />
       ) : !user ? (
-        <div cl              assName="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center min-h-screen">
           <h1>Not logged in</h1>
         </div>
       ) : (
