@@ -10,14 +10,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export const useCheck = () => {
   const [user, setUser] = useState<User | null | undefined>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
-      if (user) {
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
     return () => unsubscribe();

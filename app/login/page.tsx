@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+
 import Link from "next/link";
 
 import { useForm } from "react-hook-form";
@@ -17,13 +17,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { FaGoogle } from "react-icons/fa";
-import { useMutation } from "@tanstack/react-query";
-
 import { RotatingLines } from "react-loader-spinner";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, facebook, google } from "@/lib/firebase";
@@ -72,67 +71,76 @@ const Login = () => {
   const facebookLogIn = () => {
     signInWithPopup(auth, facebook).then((result) => {
       console.log(result.user);
-      router.push("home")
-    })
-  }
+      router.push("home");
+    });
+  };
 
-  return loading ? (
-    <main className="flex items-center flex-col min-h-screen justify-center">
-      <RotatingLines />
-    </main>
-  ) : (
-    <main className="flex flex-col items-center justify-center min-h-screen gap-2 ">
-      <h1>Login</h1>
-
-
-      <div className="flex justify-center items-center">
-
-      <Button onClick={googleLogIn}>
-        <FaGoogle />
-      </Button>
-      </div>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(login)}
-          className="flex flex-col gap-10 bg-neutral-300 p-2 rounded-md w-72"
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Email" {...field} />
-                </FormControl>
-                <FormDescription>Enter your email here</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input placeholder="Password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Login</Button>
-        </form>
-      </Form>
-      <Link href="/register" className="pb-2">
-        Register Here
-      </Link>
-      <Button>
-        <Link href="/">Return to Home</Link>
-      </Button>
-      {isPending ? <p>Authenticating</p> : <p>{error}</p>}
+  return (
+    <main className="flex items-center flex-col min-h-screen justify-center gap-2">
+      {loading ? (
+        <>
+          <RotatingLines />
+          <p>Checking if Authenticated...</p>
+        </>
+      ) : user ? (
+        <>
+          <h1>Already Logged In</h1>
+          <Button>
+          <Link href="/home">Go to Home</Link>
+          </Button>
+        </>
+      ) : (
+        <>
+          <h1>Login</h1>
+          <div className="flex justify-center items-center">
+            <Button onClick={googleLogIn}>
+              <FaGoogle />
+            </Button>
+          </div>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(login)}
+              className="flex flex-col gap-10 bg-neutral-300 p-2 rounded-md w-72"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Email" {...field} />
+                    </FormControl>
+                    <FormDescription>Enter your email here</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Login</Button>
+            </form>
+          </Form>
+          <Link href="/register" className="pb-2">
+            Register Here
+          </Link>
+          <Button>
+            <Link href="/">Return to Home</Link>
+          </Button>
+          {isPending ? <p>Authenticating</p> : <p>{error}</p>}
+        </>
+      )}
     </main>
   );
 };

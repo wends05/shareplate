@@ -1,6 +1,5 @@
 "use client";
 
-import axios from "axios";
 import Link from "next/link";
 
 import { UseFormReturn, useForm } from "react-hook-form";
@@ -17,7 +16,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
 import { useRouter } from "next/navigation";
+
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const passwordSchema = z
   .string()
@@ -40,7 +47,6 @@ const formSchema = z
   });
 
 const Register = () => {
-
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,9 +58,16 @@ const Register = () => {
   const createAccount = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
 
-    await axios.post("/api/register", values).then(() => {
+    try {
+      await createUserWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await updateProfile(auth.currentUser!, {
+        displayName: values.name,
+      });
       router.push("/home");
-    })
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -64,10 +77,14 @@ const Register = () => {
           onSubmit={form.handleSubmit(createAccount)}
           className="flex flex-col gap-10 justify-center align-middle bg-neutral-300 p-2 rounded-md w-72"
         >
-          {createFormField("name", "Name", form)}
-          {createFormField("email", "Email", form)}
-          {createFormField("password", "Password", form)}
-          {createFormField("confirmPassword", "Confirm Password", form)}
+          <CreateFormField name="name" displayName="Name" form={form} />
+          <CreateFormField name="email" displayName="Email" form={form} />
+          <CreateFormField name="password" displayName="Password" form={form} />
+          <CreateFormField
+            name="confirmPassword"
+            displayName="Confirm Password"
+            form={form}
+          />
           <Button type="submit">Create Account</Button>
         </form>
       </Form>
@@ -78,12 +95,17 @@ const Register = () => {
   );
 };
 
-const createFormField = (
-  name: "name" |"email" | "password" | "confirmPassword",
-  displayName: string,
-  form: UseFormReturn<z.infer<typeof formSchema>>,
-  description?: string
-) => (
+const CreateFormField = ({
+  name,
+  displayName,
+  form,
+  description,
+}: {
+  name: "name" | "email" | "password" | "confirmPassword";
+  displayName: string;
+  form: UseFormReturn<z.infer<typeof formSchema>>;
+  description?: string;
+}) => (
   <FormField
     control={form.control}
     name={name}

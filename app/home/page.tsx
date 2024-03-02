@@ -19,7 +19,7 @@ const Home = () => {
       <div className="w-32 min-h-screen absolute bg-neutral-500 left-0">
         sidebar
       </div>
-      <main className="flex items-center justify-center">
+      <main className="flex flex-col items-center justify-center">
         <div>
           <h1>Welcome to</h1>
           <h2>SharePlate</h2>
